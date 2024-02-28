@@ -65,16 +65,12 @@ def set_openai_api_key(api_key):
 
 def sidebar():
     with st.sidebar:
-        st.markdown(
-            "## How to use\n"
-            "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"  # noqa: E501
-            "2. Upload a PDF file📄\n"
-        )
+
         api_key_input = st.text_input(
-            "OpenAI API Key",
+            "Application Password",
             type="password",
-            placeholder="Paste your OpenAI API key here (sk-...)",
-            help="You can get your API key from https://platform.openai.com/account/api-keys.",  # noqa: E501
+            placeholder="Please enter your password here",
+            help="", 
             value=st.session_state.get("OPENAI_API_KEY", ""),
         )
 
@@ -87,19 +83,23 @@ def sidebar():
             "This tool allows you to chat with your "
             "documents as well as directly get Google and Youtube search results. "
         )
-        st.markdown(
-            "This tool is a work in progress. "
-            "You can contribute to the project on [GitHub]() "
-            "with your feedback and suggestions💡"
-        )
-        st.markdown("Made by [Arjun]()")
-        st.markdown("---")
 
 
-st.set_page_config(page_title="Research Paper Reading Assist Tool",
+st.set_page_config(page_title="PDF chatbot",
                    layout="centered",
                    initial_sidebar_state="expanded")
 
+st.markdown("""
+    <style>
+        .reportview-container {
+            margin-top: -2em;
+        }
+        #MainMenu {visibility: hidden;}
+        .stDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
 st.markdown("<style> ul {display: none;} </style>", unsafe_allow_html=True)  # Removes Page Navigation
 
 st.title("DocumentGPT 📄")
@@ -115,14 +115,12 @@ if uploaded_file is not None:
     pdfDB = PDFDBStore(uploaded_file)
 
     if st.session_state.openai_api_key is None:
-        st.error("Please enter your OpenAI API key in the sidebar to continue.")
+        st.error("Please enter your application password in the sidebar to continue.")
 
     elif not pdfDB.is_valid_key():
-        st.error("Invalid OpenAI API key. Please enter a valid key in the sidebar to continue.")
+        st.error("Invalid application password. Please enter a valid key in the sidebar to continue.")
 
     else:
-        st.success("OpenAI API key set successfully!")
-
         with st.spinner("Processing PDF File...This may take a while⏳"):
             st.session_state.vector_store, st.session_state.document_chunks = save_vector_store(pdfDB)
             st.session_state.pdf_image = save_pdf_image(uploaded_file)

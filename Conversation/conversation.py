@@ -13,7 +13,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.callbacks import StreamlitCallbackHandler
 
-from CustomTools.tools import LookupTool, WebSearchTool, SummarizationTool, ArxivTool
+from CustomTools.tools import LookupTool, SummarizationTool, ArxivTool
 
 
 @dataclass
@@ -53,7 +53,6 @@ class ConversationalAgent:
         )
 
         lookup_tool = LookupTool(llm, st.session_state['vector_store'])
-        search_tool = WebSearchTool()
         summarize_tool = SummarizationTool(llm, st.session_state['document_chunks'])
         arxiv_tool = ArxivTool(llm)
 
@@ -65,26 +64,6 @@ class ConversationalAgent:
                             "into a collection of academic documents. Input should be a query, not referencing "
                             "any obscure pronouns from the conversation before that will pull out relevant information "
                             "from the database."
-            ),
-
-            Tool(
-                name="Search Internet from Arxiv",
-                func=arxiv_tool.run,
-                description="A wrapper around arxiv.org an Online Research Paper Database. Useful for when you need "
-                            "to answer questions about Physics, Mathematics, Computer Science, Quantitative Biology, "
-                            "Quantitative Finance, Statistics, Electrical Engineering, and Economics from scientific "
-                            "articles on arxiv.org before you perform a regular search on the internet. Input should "
-                            "be a search query and not referencing any obscure pronouns from the conversation. "
-            ),
-
-            Tool(
-                name="Search Internet",
-                func=search_tool.run,
-                description="Useful when you cannot find a clear answer by looking up the database or from the online "
-                            "research paper database so that you need to search the regular internet for general"
-                            " web articles for further context and understanding to give an elaborate,exact and "
-                            "clear answer. Input should be a fully formed question based on the context of what"
-                            "you couldn't find and not referencing any obscure pronouns from the conversation before."
             ),
             Tool(
                 name="Summarize Database",
@@ -105,13 +84,10 @@ class ConversationalAgent:
             verbose=False
         )
 
-        prefix = """You are a Compassionate Teacher Chatbot. Engage in a conversation with a human student about an academic topic using the knowledge you have from a database of documents. 
+        prefix = """You are an expert document analyzer Chatbot. Engage in a conversation with a human using the knowledge you have from a database of documents. 
                     Your goal is to provide answers in the friendliest and most easily understandable manner, making complex subjects relatable to even a 5-year-old child. Utilize examples and 
                     detailed explanations to ensure comprehensive understanding of the topic being discussed. Begin by searching for answers and relevant examples within the database of PDF pages 
-                    (documents) provided. If you are unable to find sufficient information, you may consult the online research paper database Arxiv to gather additional knowledge and understanding 
-                    from research papers. Only when you still lack the necessary information, you may use a general internet search to find results from web articles. However, always prioritize providing 
-                    answers and examples from the database and research papers before resorting to general internet search.
-                    You should always provide the final answer as bullet points, for the easier understanding and readability of student.
+                    (documents) provided. You should always provide the final answer as bullet points, for the easier understanding and readability of the human.
 
                     You have access to the following tools: """
 
